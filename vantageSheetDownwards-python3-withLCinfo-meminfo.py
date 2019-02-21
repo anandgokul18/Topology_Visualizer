@@ -168,6 +168,8 @@ def memoryInfo(dut):
 	d2 = json.load(open("memorylist.txt"))
 	try:
 		value=d2[dut]
+		if value=="33": #Changing value of devices that show RAM as 33 GB to 32 GB for following standard
+			value="32"
 	except:
 		value='Unknown'
 	return value
@@ -180,7 +182,7 @@ def modularwriter(dut, owner, excelColumn,excelRow):
 		if 'tg' in dut or 'ph' in dut: #7 RU devices
 			linecards=lineCardFinderForModularDevices(dut)
 			excelLocation=excelColumn+str(excelRow)
-			memoryvalue=memoryInfo(dut)+' Gigs'
+			memoryvalue=memoryInfo(dut)+' GB'
 			wks.cell(excelLocation).value = dut +"\n["+owner+"]"+"\n["+memoryvalue+"]"
 			for i in range(0,6):
 				excelRow=excelRow+1
@@ -194,7 +196,7 @@ def modularwriter(dut, owner, excelColumn,excelRow):
 		elif 'in' in dut: #8 RU devices
 			linecards=lineCardFinderForModularDevices(dut)
 			excelLocation=excelColumn+str(excelRow)
-			memoryvalue=memoryInfo(dut)+' Gigs'
+			memoryvalue=memoryInfo(dut)+' GB'
 			wks.cell(excelLocation).value = dut +"\n["+owner+"]"+"\n["+memoryvalue+"]"
 			for i in range(0,7):
 				excelRow=excelRow+1
@@ -208,7 +210,7 @@ def modularwriter(dut, owner, excelColumn,excelRow):
 		elif 'yo' in dut or 'bh' in dut: #13 RU devices
 			linecards=lineCardFinderForModularDevices(dut)
 			excelLocation=excelColumn+str(excelRow)
-			memoryvalue=memoryInfo(dut)+' Gigs'
+			memoryvalue=memoryInfo(dut)+' GB'
 			wks.cell(excelLocation).value = dut +"\n["+owner+"]"+"\n["+memoryvalue+"]"
 			for i in range(0,12):
 				excelRow=excelRow+1
@@ -219,9 +221,23 @@ def modularwriter(dut, owner, excelColumn,excelRow):
 					wks.cell(excelLocation).value = '...'
 				time.sleep(2)
 
+		elif 'glc' in dut: #4 RU devices
+			linecards=lineCardFinderForModularDevices(dut)
+			excelLocation=excelColumn+str(excelRow)
+			memoryvalue=memoryInfo(dut)+' GB'
+			wks.cell(excelLocation).value = dut +"\n["+owner+"]"+"\n["+memoryvalue+"]"
+			for i in range(0,3):
+				excelRow=excelRow+1
+				excelLocation=excelColumn+str(excelRow)
+				try:
+					wks.cell(excelLocation).value = linecards[i]
+				except IndexError:
+					wks.cell(excelLocation).value = '...'
+				time.sleep(2)
+
 		else: #2 RU devices
 			excelLocation=excelColumn+str(excelRow)
-			memoryvalue=memoryInfo(dut)+' Gigs'
+			memoryvalue=memoryInfo(dut)+' GB'
 			wks.cell(excelLocation).value = dut +"\n["+owner+"]"+"\n["+memoryvalue+"]"
 			for i in range(0,1):
 				excelRow=excelRow+1
@@ -230,8 +246,8 @@ def modularwriter(dut, owner, excelColumn,excelRow):
 				time.sleep(2)
 
 	except Exception as e:
-		print("[ERROR] One modular chassis: "+ dut + " has incorrect rack info in labtracker. Because of this, it is overlapping with another device. Fix it in labtracker first to proceed. \n Exiting...")
-		print('[FURTHER STEPS] Always modular chassis should be represented with the lowest RU/tb number in rdam')
+		print("[ERROR] One modular chassis: "+ dut + " got an error!!! ")
+		print('[FURTHER STEPS] Always modular chassis should be represented with the lowest RU/tb number in rdam. There might be incorrect rack info in labtracker. Because of this, it is overlapping with another device. Fix it in labtracker first to proceed. \n Exiting...')
 		print(e)
 		sys.exit(1)
 
@@ -285,7 +301,7 @@ if __name__== "__main__":
 	sh = gc.open_by_url("https://docs.google.com/spreadsheets/d/1IK-SBOskJnK4aoUI1MohT-QUpTVnS8FCbyKTMsMHLgQ/edit#gid=0")
 
 	#Open Worksheet by name
-	wks = sh.worksheet_by_title("Vantage Map- Experimental")
+	wks = sh.worksheet_by_title("Vantage Map")
 
 
 	blrDevices = bangaloreRackDeviceList()
@@ -328,7 +344,7 @@ if __name__== "__main__":
 			excelLocation=excelColumn+str(excelRow)
 			aliasForCell=wks.cell(excelLocation)
 			aliasForCell.unlink()
-			memoryvalue=memoryInfo(dut)+' Gigs'
+			memoryvalue=memoryInfo(dut)+' GB'
 			aliasForCell.value=dut + "\n[" + blrDevices[dut][2] + "]"+"\n["+memoryvalue+"]"
 			##noteForCell="Owner: "+ blrDevices[dut][2] +"\n" +"Chipset: " + str(blrDevices[dut][3])
 			##aliasForCell.note=noteForCell
